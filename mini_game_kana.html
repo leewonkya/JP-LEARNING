@@ -82,7 +82,7 @@
   <script>
     const KANA_GROUPS = {
       hiragana: "あいうえおかきくけこがぎぐげごさしすせそざじずぜぞたちつてとだぢづでどなにぬねのはひふへほばびぶべぼぱぴぷぺぽまみむめもやゆよらりるれろわをん",
-      katakana: "アイウエオカキクケコガギグゲゴサシスセソザジズゼゾタチツテトダヂヅデドナニヌネノハヒフヘホバビブベボパピプペポマミムメモヤユヨラリルレロワヲン",
+      katakana: "アイウエオカキクケコガギグゲゴサシスセソザジズゼゾタチツテトダヂヅデドナニヌネノハヒフヘホバヒブベホパピプペポマミムメモヤユヨラリルレロワヲン",
       romaji: "a i u e o ka ki ku ke ko ga gi gu ge go sa shi su se so za ji zu ze zo ta chi tsu te to da ji zu de do na ni nu ne no ha hi fu he ho ba bi bu be bo pa pi pu pe po ma mi mu me mo ya yu yo ra ri ru re ro wa o n"
     };
 
@@ -95,27 +95,36 @@
     let timer;
     let scrambleInterval;
     
-    // === CÁC BIẾN MỚI CHO ÂM THANH ===
-    let audioEnabled = true; // Mặc định bật âm thanh
+    // === CÁC BIẾN MỚI CHO ÂM THANH (WEB SPEECH API) ===
+    let audioEnabled = true; 
     const synth = window.speechSynthesis;
-    const voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+    // Tìm giọng Nhật Bản nếu có
+    let voice = null;
+    if (synth) {
+      synth.onvoiceschanged = () => {
+        voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+      };
+      // Gọi ngay lập tức nếu voices đã sẵn sàng
+      if (synth.getVoices().length > 0) {
+        voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+      }
+    }
+
 
     // === HÀM PHÁT ÂM MỚI ===
     function speakKana(kana) {
       if (!audioEnabled || !synth) return;
       
-      // Hủy bỏ giọng nói đang chạy (nếu có)
       if (synth.speaking) {
         synth.cancel();
       }
 
       const utterance = new SpeechSynthesisUtterance(kana);
       utterance.lang = 'ja-JP';
-      // Tùy chọn, chọn giọng Nhật Bản nếu có
       if (voice) {
         utterance.voice = voice;
       }
-      utterance.rate = 0.8; // Điều chỉnh tốc độ
+      utterance.rate = 0.8;
       
       synth.speak(utterance);
     }
@@ -128,25 +137,21 @@
       } else {
         this.textContent = '🔇 Tắt âm thanh';
         if (synth && synth.speaking) {
-          synth.cancel(); // Tắt âm thanh đang phát
+          synth.cancel(); 
         }
       }
     });
     
-    // Lấy nội dung file mini_game_kana.html để đảm bảo các thay đổi được áp dụng
-    function getKanaIndex(kana){
-      return KANA_GROUPS.hiragana.indexOf(kana);
-    }
-
+    
     function scrambleEffect(kana){
       const kanaElem = document.getElementById("kana");
-      const duration = 750; // Thời gian hiệu ứng (ms)
+      const duration = 750;
       let startTime;
 
       function animate(timestamp) {
         if (!startTime) startTime = timestamp;
         const progress = timestamp - startTime;
-        const scrambleCount = Math.floor(progress / 50); // Đổi ký tự mỗi 50ms
+        const scrambleCount = Math.floor(progress / 50);
 
         if (progress < duration) {
           if (scrambleCount % 2 === 0) {
@@ -158,8 +163,7 @@
         } else {
           // Hiệu ứng hoàn thành
           kanaElem.textContent = kana;
-          // === PHÁT ÂM THANH SAU KHI HIỆU ỨNG KẾT THÚC ===
-          speakKana(kana); 
+          speakKana(kana); // PHÁT ÂM
         }
       }
 
@@ -172,15 +176,12 @@
       document.getElementById("status").textContent="Chọn đáp án đúng!";
       document.querySelectorAll(".answers button").forEach(btn=>{btn.classList.remove("correct","wrong");btn.disabled=false;});
       
-      // 1. Chọn Kana (Ký tự Nhật Bản) ngẫu nhiên
       const kanaIndex = Math.floor(Math.random()*selectedKana.length);
       const randomKana = selectedKana[kanaIndex];
       currentAnswer = selectedRomaji[kanaIndex];
       
-      // 2. Chạy hiệu ứng Scramble và phát âm
-      scrambleEffect(randomKana);
+      scrambleEffect(randomKana); // CHẠY HIỆU ỨNG VÀ PHÁT ÂM
 
-      // 3. Tạo 4 đáp án (1 đúng, 3 sai)
       let answers = [currentAnswer];
       while(answers.length < 4){
         const randomIndex = Math.floor(Math.random()*selectedRomaji.length);
@@ -190,44 +191,38 @@
         }
       }
       
-      // Xáo trộn vị trí đáp án
       answers.sort(()=>Math.random()-0.5);
       
-      // 4. Hiển thị đáp án
       document.getElementById("btn1").textContent=answers[0];
       document.getElementById("btn2").textContent=answers[1];
       document.getElementById("btn3").textContent=answers[2];
       document.getElementById("btn4").textContent=answers[3];
 
-      // 5. Thiết lập Timer
       clearTimeout(timer);
       timer = setTimeout(()=>{
         wrong++;
         document.getElementById("wrong").textContent=wrong;
         document.getElementById("status").textContent="⏰ Hết giờ! Đáp án đúng: "+currentAnswer;
         document.querySelectorAll(".answers button").forEach(btn=>btn.disabled=true);
-        // Tùy chọn: Phát âm đáp án đúng khi hết giờ
-        speakKana(randomKana); 
+        speakKana(randomKana); // PHÁT ÂM KHI HẾT GIỜ
       }, document.getElementById("thinkTime").value*1000);
     }
 
     function chooseAnswer(i){
       clearTimeout(timer);
-      const kanaToSpeak = document.getElementById("kana").textContent; // Lấy ký tự hiện tại
+      const kanaToSpeak = document.getElementById("kana").textContent;
       let btn=document.getElementById("btn"+i);
       
       if(btn.textContent===currentAnswer){
         correct++;
         btn.classList.add("correct");
         document.getElementById("status").textContent="🎉 Đúng!";
-        // Phát âm lại ký tự sau khi trả lời đúng
-        speakKana(kanaToSpeak); 
+        speakKana(kanaToSpeak); // PHÁT ÂM KHI TRẢ LỜI ĐÚNG
       } else {
         wrong++;
         btn.classList.add("wrong");
         document.getElementById("status").textContent="❌ Sai! Đáp án đúng: "+currentAnswer;
-        // Phát âm lại ký tự sau khi trả lời sai (để người chơi học)
-        speakKana(kanaToSpeak); 
+        speakKana(kanaToSpeak); // PHÁT ÂM KHI TRẢ LỜI SAI
       }
       
       document.getElementById("correct").textContent=correct;
@@ -244,7 +239,7 @@
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = group;
-        checkbox.checked = true; // Mặc định chọn tất cả
+        checkbox.checked = true;
         checkbox.addEventListener('change', updateKanaSet);
         
         const label = document.createElement('label');
@@ -261,7 +256,6 @@
       let newKana = '';
       let newRomaji = [];
       
-      // Chỉ kiểm tra hiragana và katakana
       if (document.getElementById('hiragana') && document.getElementById('hiragana').checked) {
         newKana += KANA_GROUPS.hiragana;
         newRomaji = newRomaji.concat(KANA_GROUPS.romaji.split(' '));
@@ -273,14 +267,12 @@
       
       if (newKana.length === 0) {
         alert("Vui lòng chọn ít nhất một nhóm Kana!");
-        // Nếu không chọn gì, quay lại chọn hiragana
         document.getElementById('hiragana').checked = true;
         updateKanaSet();
         return;
       }
 
       selectedKana = newKana;
-      // Loại bỏ các Romaji trùng lặp (nếu có, không áp dụng cho Kana nhưng cần thiết nếu có các nhóm khác)
       selectedRomaji = [...new Set(newRomaji)];
       resetGame();
     }
@@ -296,7 +288,7 @@
       document.querySelectorAll(".answers button").forEach(btn=>{btn.textContent="";btn.classList.remove("correct","wrong");btn.disabled=false;});
       clearTimeout(timer);
       if (synth && synth.speaking) {
-        synth.cancel();
+        synth.cancel(); // Hủy giọng nói khi reset game
       }
     }
 
