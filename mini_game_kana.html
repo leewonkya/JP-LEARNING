@@ -3,19 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>Mini Game Kana</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { background:#0f172a; color:#f1f5f9; font-family:sans-serif; text-align:center; margin:0; padding:20px; }
-    .game-box{ margin:30px auto; padding:20px; background:#1e293b; border-radius:12px; width:750px; max-width:95%; box-shadow:0 4px 12px rgba(0,0,0,0.4); }
-    h2{ margin-top:0; color:#facc15; }
-    .kana{ font-size:90px; margin:20px; min-height:100px; display:flex; align-items:center; justify-content:center; font-weight:bold; letter-spacing:3px; }
-    .scramble { display:inline-block; }
-    .answers{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:20px; }
-    button{ padding:12px; font-size:20px; border:none; border-radius:8px; cursor:pointer; background:#334155; color:#f1f5f9; transition:all 0.25s; }
+    /* === BASE STYLES === */
+    body { 
+      background:#0f172a; 
+      color:#f1f5f9; 
+      font-family:sans-serif; 
+      text-align:center; 
+      margin:0; 
+      padding:20px; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .game-box{ 
+      margin:10px auto; 
+      padding:20px; 
+      background:#1e293b; 
+      border-radius:12px; 
+      width:750px; 
+      max-width:95%; 
+      box-shadow:0 4px 12px rgba(0,0,0,0.4); 
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    h2{ 
+      margin-top:0; 
+      color:#facc15; 
+      font-size: 6vw;
+    }
+    .kana{ 
+      font-size:16vw; 
+      margin:20px; 
+      min-height:15vh; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      font-weight:bold; 
+      letter-spacing:3px; 
+      flex-grow: 1;
+    }
+    
+    /* === CONTROLS & ANSWERS STYLES === */
+    .controls, .switch-group { margin:15px 0; }
+    .answers{ 
+      display:grid; 
+      grid-template-columns:repeat(2,1fr); 
+      gap:10px; 
+      margin-top:20px; 
+      margin-bottom: 20px;
+    }
+    button{ 
+      padding:15px;
+      font-size:4vw; 
+      border:none; 
+      border-radius:8px; 
+      cursor:pointer; 
+      background:#334155; 
+      color:#f1f5f9; 
+      transition:all 0.25s; 
+    }
     button:hover:not(:disabled){ background:#475569; transform:scale(1.05); }
     .correct{ background:#22c55e !important; color:#fff !important; }
     .wrong{ background:#ef4444 !important; color:#fff !important; }
-    #stats{ margin-top:20px; font-size:18px; }
-    .switch-group { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin:15px 0; }
+
+    #stats{ margin-top:20px; font-size:4vw; }
+    #status{ font-size: 5vw; font-weight: bold; margin: 10px 0; }
+
+    /* Điều chỉnh kích thước cho các control */
+    select.form-control, input.form-control {
+      padding:6px 10px; font-size:3.5vw;
+      border-radius:0.375rem;
+    }
+    
+    /* === TOGGLE SWITCH STYLES (ĐÃ KHÔI PHỤC) === */
+    .switch-group { 
+        display:grid; 
+        grid-template-columns: repeat(2, 1fr); /* Yêu cầu 2: 2 cột trên mobile */
+        gap: 15px 10px; 
+        justify-content:center; 
+        margin:15px 0; 
+    }
     .switch-container { display:flex; align-items:center; gap:6px; }
     .switch { position:relative; display:inline-block; width:46px; height:24px; }
     .switch input { opacity:0; width:0; height:0; }
@@ -23,17 +94,31 @@
     .slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
     input:checked + .slider { background-color:#22c55e; }
     input:checked + .slider:before { transform:translateX(22px); }
-    .switch-label { font-size:14px; color:#f1f5f9; }
-    select.form-control, input.form-control {
-      display:inline-block; width:auto; padding:6px 12px; font-size:16px;
-      line-height:1.5; color:#1e293b; background-color:#fff;
-      border:1px solid #ced4da; border-radius:0.375rem;
-      transition:border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    .switch-label { font-size: 14px; color:#f1f5f9; }
+
+    /* === MEDIA QUERY CHO MÀN HÌNH LỚN HƠN (Desktop/Tablet) === */
+    @media (min-width: 768px) {
+      .game-box {
+        width: 750px;
+        height: auto;
+        margin-top: 30px;
+        max-width: 90%;
+      }
+      h2 { font-size: 24px; }
+      .kana { font-size: 90px; min-height: 100px; }
+      button { font-size: 20px; padding: 12px; }
+      #stats { font-size: 18px; }
+      #status { font-size: 20px; }
+      select.form-control, input.form-control { font-size: 16px; }
+      
+      /* Trên desktop, chuyển về bố cục ban đầu (flex-wrap) */
+      .switch-group { 
+        display: flex;
+        grid-template-columns: none;
+        flex-wrap: wrap; 
+        gap: 15px; 
+      }
     }
-    select.form-control:focus, input.form-control:focus {
-      border-color:#80bdff; outline:0; box-shadow:0 0 0 0.2rem rgba(0,123,255,.25);
-    }
-    .controls{ margin:15px 0; }
   </style>
 </head>
 <body>
@@ -61,13 +146,16 @@
       <button onclick="resetGame()">Đặt lại</button>
     </div>
     <div class="kana" id="kana">?</div>
+    
+    <p id="status">Nhấn Bắt đầu cho câu tiếp theo.</p>
+
     <div class="answers" id="answersBox">
       <button onclick="chooseAnswer(0)" id="btn0"></button>
       <button onclick="chooseAnswer(1)" id="btn1"></button>
       <button onclick="chooseAnswer(2)" id="btn2"></button>
       <button onclick="chooseAnswer(3)" id="btn3"></button>
     </div>
-    <p id="status">Nhấn Bắt đầu cho câu tiếp theo.</p>
+    
     <div id="stats">
       ✅ Đúng: <span id="correct">0</span> | ❌ Sai: <span id="wrong">0</span> | 📊 Tổng: <span id="total">0</span>
     </div>
@@ -147,7 +235,6 @@
     function startGame(){
       clearTimeout(timer);
       
-      // Clear button text và trạng thái
       document.querySelectorAll(".answers button").forEach(btn=>{
         btn.disabled=false;
         btn.classList.remove("correct","wrong");
@@ -159,7 +246,6 @@
       let groups=getSelectedGroups();
       if(groups.length===0){alert("Chọn ít nhất 1 nhóm");return;}
       
-      // 1. Chuẩn bị câu hỏi và đáp án
       let group=groups[Math.floor(Math.random()*groups.length)];
       let idx=Math.floor(Math.random()*kanaMap[group].roma.length);
       let kanaChar=kanaMap[group][mode][idx];
@@ -170,7 +256,6 @@
       
       const kanaElem=document.getElementById("kana");
       
-      // Chuẩn bị 3 đáp án nhiễu
       let answers=[currentAnswer];
       const allPossibleAnswers = groups.flatMap(g => 
         (qMode === "toRoma" ? kanaMap[g].roma : kanaMap[g][mode])
@@ -182,17 +267,14 @@
 
       answers.sort(()=>Math.random()-0.5);
       
-      // 2. Định nghĩa hàm callback (Hành động sau khi scramble xong)
       const onAnimationComplete = () => {
           answers.forEach((ans,i)=>{document.getElementById("btn"+i).textContent=ans;});
           document.getElementById("status").textContent="Chọn đáp án đúng!";
 
-          // Bắt đầu đếm giờ
           timer=setTimeout(()=>{
               wrong++;
               document.getElementById("wrong").textContent=wrong;
               
-              // Highlight đáp án đúng khi hết giờ
               document.querySelectorAll(".answers button").forEach(btn => {
                   if (btn.textContent === currentAnswer) {
                       btn.classList.add("correct");
@@ -204,7 +286,6 @@
           }, document.getElementById("thinkTime").value*1000);
       };
 
-      // 3. Bắt đầu scramble và truyền callback
       scrambleText(kanaElem, questionDisplay, 1500, qMode, mode, groups, onAnimationComplete);
       
       total++;
@@ -212,32 +293,26 @@
       document.getElementById("status").textContent="Đang tải câu hỏi...";
     }
 
-    // HÀM CHOOSEANSWER ĐÃ ĐƯỢC CHỈNH SỬA
     function chooseAnswer(i){
       clearTimeout(timer);
       let btn=document.getElementById("btn"+i);
       
-      // Vô hiệu hóa tất cả các nút
       document.querySelectorAll(".answers button").forEach(b=>b.disabled=true);
 
       if(btn.textContent===currentAnswer){
-        // Trường hợp 1: Chọn ĐÚNG
         correct++;
         btn.classList.add("correct"); 
         document.getElementById("status").textContent="🎉 Đúng!";
       } else {
-        // Trường hợp 2: Chọn SAI (Yêu cầu 1 & 2)
         wrong++;
         btn.classList.add("wrong"); 
         
-        // Tìm và highlight đáp án đúng
         document.querySelectorAll(".answers button").forEach(correctBtn => {
             if (correctBtn.textContent === currentAnswer) {
                 correctBtn.classList.add("correct"); 
             }
         });
         
-        // Hiển thị đáp án đúng trong dòng status
         document.getElementById("status").textContent=`❌ Sai! Đáp án đúng: ${currentAnswer}`;
       }
       
