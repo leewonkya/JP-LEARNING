@@ -5,60 +5,153 @@
   <title>Mini Game Kana</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* === BASE STYLES === */
+    /* === BASE STYLES: Áp dụng cho cả Mobile và Desktop === */
     body { 
       background:#0f172a; 
       color:#f1f5f9; 
       font-family:sans-serif; 
       text-align:center; 
       margin:0; 
-      padding:20px; 
+      padding:10px; 
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-sizing: border-box;
     }
     .game-box{ 
       margin:10px auto; 
-      padding:20px; 
+      padding:15px; 
       background:#1e293b; 
       border-radius:12px; 
       width:750px; 
-      max-width:95%; 
+      max-width:100%; 
       box-shadow:0 4px 12px rgba(0,0,0,0.4); 
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
     h2{ 
       margin-top:0; 
       color:#facc15; 
-      font-size: 6vw;
+      font-size: 5vw; 
     }
     .kana{ 
-      font-size:16vw; 
-      margin:20px; 
-      min-height:15vh; 
+      font-size:15vw; 
+      margin:10px; 
+      min-height:10vh; 
       display:flex; 
       align-items:center; 
       justify-content:center; 
       font-weight:bold; 
       letter-spacing:3px; 
       flex-grow: 1;
+      overflow: hidden;
     }
     
-    /* === CONTROLS & ANSWERS STYLES === */
-    .controls, .switch-group { margin:15px 0; }
+    /* === CONTROL LAYOUT FIXES (MOBILE) === */
+    .controls-top { 
+        display: flex;
+        flex-direction: column; /* 2 hàng riêng biệt cho Bảng chữ & Chế độ */
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 0 5px;
+    }
+    .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+        font-size: 3.5vw;
+    }
+    select.form-control, input.form-control {
+      padding:6px 8px; 
+      font-size:3.5vw; 
+      line-height:1.5; 
+      color:#1e293b; 
+      background-color:#fff;
+      border:1px solid #ced4da; 
+      border-radius:0.375rem;
+      max-width: 50vw;
+    }
+    .control-row label {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+    .control-row > span { display: none; }
+
+    /* === TIME AND BUTTONS LAYOUT (MOBILE) === */
+    .time-start-controls {
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .time-start-controls label {
+        display: flex;
+        align-items: center;
+        font-size: 3.5vw;
+        flex-shrink: 0;
+    }
+    .time-start-controls input.form-control {
+        width: 10vw; 
+        min-width: 40px;
+        text-align: center;
+    }
+    .time-start-controls button {
+        flex-basis: 40%; 
+        font-size: 4vw;
+        padding: 10px;
+    }
+
+    /* === TOGGLE SWITCHES LAYOUT (MOBILE 5x2 Cân đối) === */
+    #groupSwitches {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+        padding: 0 5px;
+    }
+    /* Grid 5 cột cho cả hai hàng (5-5) */
+    .group-row { 
+        display: grid; 
+        grid-template-columns: repeat(5, 1fr); 
+        gap: 8px 3px; /* Giảm khoảng cách ngang */
+        width: 100%;
+        /* đảm bảo row-1 và row-2 hiển thị grid 5 cột */
+    }
+    #row-3 { display: none; } /* Ẩn row 3 không dùng trong bố cục 5x2 */
+
+    .switch-container { 
+      display:flex; 
+      align-items:center; 
+      gap:3px;
+      justify-content: center;
+    }
+    .switch { position:relative; display:inline-block; width:40px; height:22px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#64748b; transition:.4s; border-radius:22px; }
+    .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
+    input:checked + .slider { background-color:#22c55e; }
+    input:checked + .slider:before { transform:translateX(18px); }
+    .switch-label { font-size: 3vw; color:#f1f5f9; } /* Điều chỉnh font nhỏ hơn để phù hợp với 5 cột */
+
+
+    /* === ANSWERS & STATUS STYLES === */
     .answers{ 
       display:grid; 
       grid-template-columns:repeat(2,1fr); 
-      gap:10px; 
-      margin-top:20px; 
-      margin-bottom: 20px;
+      gap:8px; 
+      margin-top:10px; 
+      margin-bottom: 10px;
     }
+    /* === HOÀN NGUYÊN STYLE BUTTON CŨ VÀ XÓA HIỆU ỨNG TRANSFORM === */
     button{ 
-      padding:15px;
-      font-size:4vw; 
+      padding:12px;
+      font-size:4vw; /* Giữ kích thước tương đối trên mobile */
       border:none; 
       border-radius:8px; 
       cursor:pointer; 
@@ -66,85 +159,134 @@
       color:#f1f5f9; 
       transition:all 0.25s; 
     }
-    button:hover:not(:disabled){ background:#475569; transform:scale(1.05); }
+    button:hover:not(:disabled){ 
+        background:#475569; 
+        /* Xóa transform:scale(1.05) */
+    }
     .correct{ background:#22c55e !important; color:#fff !important; }
     .wrong{ background:#ef4444 !important; color:#fff !important; }
 
-    #stats{ margin-top:20px; font-size:4vw; }
-    #status{ font-size: 5vw; font-weight: bold; margin: 10px 0; }
-
-    /* Điều chỉnh kích thước cho các control */
-    select.form-control, input.form-control {
-      padding:6px 10px; font-size:3.5vw;
-      border-radius:0.375rem;
-    }
+    #stats{ margin-top:10px; font-size:3.5vw; }
+    #status{ font-size: 4vw; font-weight: bold; margin: 5px 0; }
     
-    /* === TOGGLE SWITCH STYLES (ĐÃ KHÔI PHỤC) === */
-    .switch-group { 
-        display:grid; 
-        grid-template-columns: repeat(2, 1fr); /* Yêu cầu 2: 2 cột trên mobile */
-        gap: 15px 10px; 
-        justify-content:center; 
-        margin:15px 0; 
-    }
-    .switch-container { display:flex; align-items:center; gap:6px; }
-    .switch { position:relative; display:inline-block; width:46px; height:24px; }
-    .switch input { opacity:0; width:0; height:0; }
-    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#64748b; transition:.4s; border-radius:24px; }
-    .slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
-    input:checked + .slider { background-color:#22c55e; }
-    input:checked + .slider:before { transform:translateX(22px); }
-    .switch-label { font-size: 14px; color:#f1f5f9; }
-
-    /* === MEDIA QUERY CHO MÀN HÌNH LỚN HƠN (Desktop/Tablet) === */
+    /* === MEDIA QUERY CHO MÀN HÌNH LỚN HƠN (Desktop/Tablet: Giữ nguyên layout ban đầu) === */
     @media (min-width: 768px) {
+      body { padding: 20px; }
       .game-box {
         width: 750px;
-        height: auto;
-        margin-top: 30px;
-        max-width: 90%;
+        padding: 20px;
       }
       h2 { font-size: 24px; }
-      .kana { font-size: 90px; min-height: 100px; }
-      button { font-size: 20px; padding: 12px; }
+      .kana { font-size: 90px; margin: 20px; }
+      
+      /* Restore Original Control Layout: 1 hàng */
+      .controls-top {
+        flex-direction: row; 
+        justify-content: center;
+        gap: 15px;
+        margin: 15px 0;
+        padding: 0;
+      }
+      .control-row {
+        justify-content: center;
+        gap: 15px;
+        font-size: 16px;
+      }
+      .control-row > span { display: inline; } /* Hiện lại dấu | */
+      select.form-control, input.form-control { 
+          font-size: 16px; 
+          max-width: none; 
+          padding: 6px 12px;
+      }
+      
+      /* Restore Original Time/Button Layout: 1 hàng */
+      .time-start-controls {
+        margin: 15px 0;
+        gap: 15px;
+        flex-wrap: nowrap;
+      }
+      .time-start-controls label { 
+        font-size: 16px; 
+      }
+      .time-start-controls input.form-control { width: auto; min-width: 0; }
+      .time-start-controls button {
+        font-size: 20px; 
+        padding: 12px;
+        flex-basis: auto;
+      }
+      
+      /* Buttons Desktop style */
+      button { 
+        font-size:20px;
+        padding:12px;
+      }
+      button:hover:not(:disabled){ background:#475569; }
+
+      /* Restore Original Switch Layout (Single row flex-wrap) */
+      #groupSwitches {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin: 15px 0;
+      }
+      .group-row {
+          display: flex; /* Trở lại flex cho desktop */
+          grid-template-columns: none;
+          gap: 15px;
+      }
+      #row-2, #row-3 {
+        display: none; 
+      }
+      
+      /* Cấu hình lại Switch trên desktop */
+      .switch-container { justify-content: flex-start; }
+      .switch { width:46px; height:24px; }
+      .slider:before { height:18px; width:18px; }
+      input:checked + .slider:before { transform:translateX(22px); }
+      .switch-label { font-size: 14px; }
+
       #stats { font-size: 18px; }
       #status { font-size: 20px; }
-      select.form-control, input.form-control { font-size: 16px; }
-      
-      /* Trên desktop, chuyển về bố cục ban đầu (flex-wrap) */
-      .switch-group { 
-        display: flex;
-        grid-template-columns: none;
-        flex-wrap: wrap; 
-        gap: 15px; 
-      }
     }
   </style>
 </head>
 <body>
   <div class="game-box">
     <h2>Mini Game Kana</h2>
+    
     <div class="controls">
-      <label>Bảng chữ: 
-        <select id="mode" class="form-control">
-          <option value="hiragana">Hiragana</option>
-          <option value="katakana">Katakana</option>
-        </select>
-      </label>
-      &nbsp; | &nbsp;
-      <label>Chế độ câu hỏi:
-        <select id="questionMode" class="form-control">
-          <option value="toRoma">Chọn Romaji từ Ký tự</option>
-          <option value="toKana">Chọn Ký tự từ Romaji</option>
-        </select>
-      </label>
+      <div class="controls-top">
+          <div class="control-row">
+            <label>Bảng chữ: 
+              <select id="mode" class="form-control">
+                <option value="hiragana">Hiragana</option>
+                <option value="katakana">Katakana</option>
+              </select>
+            </label>
+            <span>|</span>
+          </div>
+          <div class="control-row">
+            <label>Chế độ câu hỏi:
+              <select id="questionMode" class="form-control">
+                <option value="toRoma">Chọn Romaji từ Ký tự</option>
+                <option value="toKana">Chọn Ký tự từ Romaji</option>
+              </select>
+            </label>
+          </div>
+      </div>
+
+      <div id="groupSwitches">
+        </div>
+      
+      <div class="time-start-controls">
+        <label>Thời gian suy nghĩ mỗi câu (giây): <input type="number" id="thinkTime" value="5" min="1" class="form-control"></label>
+        <button onclick="startGame()">Bắt đầu</button>
+        <button onclick="resetGame()">Đặt lại</button>
+      </div>
     </div>
-    <div class="switch-group" id="groupSwitches"></div>
-    <div class="controls">
-      <label>Thời gian suy nghĩ mỗi câu (giây): <input type="number" id="thinkTime" value="5" min="1" class="form-control"></label>
-      <button onclick="startGame()">Bắt đầu</button>
-      <button onclick="resetGame()">Đặt lại</button>
-    </div>
+
     <div class="kana" id="kana">?</div>
     
     <p id="status">Nhấn Bắt đầu cho câu tiếp theo.</p>
@@ -184,12 +326,48 @@
     function renderGroupSwitches(){
       const container=document.getElementById("groupSwitches");
       container.innerHTML="";
-      groupKeys.forEach(key=>{
-        const div=document.createElement("div");
-        div.className="switch-container";
-        div.innerHTML=`<label class="switch"><input type="checkbox" class="groupFilter" value="${key}" checked><span class="slider"></span></label><span class="switch-label">${key}</span>`;
-        container.appendChild(div);
-      });
+      
+      const rows = [
+          { id: 'row-1', keys: groupKeys.slice(0, 5) },  // 5 items
+          { id: 'row-2', keys: groupKeys.slice(5, 10) } // 5 items
+      ];
+      
+      // Xử lý bố cục Desktop: Chuyển tất cả về row-1 duy nhất (Flex-wrap)
+      if (window.innerWidth >= 768) {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "group-row";
+          rowDiv.id = 'row-1';
+          
+          groupKeys.forEach(key => {
+              const div=document.createElement("div");
+              div.className="switch-container";
+              const isChecked = document.querySelector(`.groupFilter[value="${key}"]`) ? document.querySelector(`.groupFilter[value="${key}"]`).checked : true;
+              div.innerHTML=`<label class="switch"><input type="checkbox" class="groupFilter" value="${key}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label><span class="switch-label">${key}</span>`;
+              rowDiv.appendChild(div);
+          });
+          container.appendChild(rowDiv);
+          // Đảm bảo chỉ có row-1 hiển thị trên desktop
+          document.getElementById('row-2')?.remove();
+      } 
+      // Xử lý bố cục Mobile: 5x2 (Grid)
+      else {
+          rows.forEach(rowInfo => {
+              const rowDiv = document.createElement("div");
+              rowDiv.className = "group-row";
+              rowDiv.id = rowInfo.id;
+              
+              rowInfo.keys.forEach(key => {
+                  const div=document.createElement("div");
+                  div.className="switch-container";
+                  const isChecked = document.querySelector(`.groupFilter[value="${key}"]`) ? document.querySelector(`.groupFilter[value="${key}"]`).checked : true;
+                  div.innerHTML=`<label class="switch"><input type="checkbox" class="groupFilter" value="${key}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label><span class="switch-label">${key}</span>`;
+                  rowDiv.appendChild(div);
+              });
+              container.appendChild(rowDiv);
+          });
+          // Xóa row-3 cũ nếu nó tồn tại
+          document.getElementById('row-3')?.remove();
+      }
     }
 
     function getSelectedGroups(){
@@ -333,6 +511,15 @@
     }
 
     renderGroupSwitches();
+    
+    // Thêm listener để gọi lại render khi resize (chuyển đổi mobile/desktop)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            renderGroupSwitches();
+        }, 100);
+    });
   </script>
 </body>
 </html>
