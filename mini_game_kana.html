@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>Mini Game Kana</title>
-<!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/leewonkya/JP-LEARNING/main/icons/favicon.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon"
+    href="https://raw.githubusercontent.com/leewonkya/JP-LEARNING/main/icons/favicon.png">
   <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/leewonkya/JP-LEARNING/main/icons/apple-touch-icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="180x180"
+    href="https://raw.githubusercontent.com/leewonkya/JP-LEARNING/main/icons/apple-touch-icon-180x180.png">
 
   <!-- Android Chrome Icons (Manifest) -->
   <link rel="manifest" href="https://raw.githubusercontent.com/leewonkya/JP-LEARNING/main/manifest.json">
@@ -15,293 +18,63 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="KanaGame">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* === BASE STYLES: Áp dụng cho cả Mobile và Desktop === */
-    body { 
-      background:#0f172a; 
-      color:#f1f5f9; 
-      font-family:sans-serif; 
-      text-align:center; 
-      margin:0; 
-      padding:10px; 
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-sizing: border-box;    
-	overflow: hidden;
-    }
-    .game-box{ 
-      margin:10px auto; 
-      padding:15px; 
-      background:#1e293b; 
-      border-radius:12px; 
-      width:750px; 
-      max-width:100%; 
-      box-shadow:0 4px 12px rgba(0,0,0,0.4); 
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-    }
-    h2{ 
-      margin-top:0; 
-      color:#facc15; 
-      font-size: 5vw; 
-    }
-    .kana{ 
-      font-size:15vw; 
-      margin:10px; 
-      min-height:10vh;     
-max-height: 18vh;
-      display:flex; 
-      align-items:center; 
-      justify-content:center; 
-      font-weight:bold; 
-      letter-spacing:3px; 
-      flex-grow: 1;
-      overflow: hidden;
-    }
-    
-    /* === CONTROL LAYOUT FIXES (MOBILE) === */
-    .controls-top { 
-        display: flex;
-        flex-direction: column; /* 2 hàng riêng biệt cho Bảng chữ & Chế độ */
-        gap: 8px;
-        margin-bottom: 10px;
-        padding: 0 5px;
-    }
-    .control-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 5px;
-        font-size: 3.5vw;
-    }
-    select.form-control, input.form-control {
-      padding:6px 8px; 
-      font-size:3.5vw; 
-      line-height:1.5; 
-      color:#1e293b; 
-      background-color:#fff;
-      border:1px solid #ced4da; 
-      border-radius:0.375rem;
-      max-width: 50vw;
-    }
-    .control-row label {
-        display: flex;
-        align-items: center;
-        gap: 3px;
-    }
-    .control-row > span { display: none; }
-
-    /* === TIME AND BUTTONS LAYOUT (MOBILE) === */
-    .time-start-controls {
-        display: flex;
-        flex-wrap: wrap; 
-        justify-content: center;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    .time-start-controls label {
-        display: flex;
-        align-items: center;
-        font-size: 3.5vw;
-        flex-shrink: 0;
-    }
-    .time-start-controls input.form-control {
-        width: 10vw; 
-        min-width: 40px;
-        text-align: center;
-    }
-    .time-start-controls button {
-        flex-basis: 40%; 
-        font-size: 4vw;
-        padding: 10px;
-    }
-
-    /* === TOGGLE SWITCHES LAYOUT (MOBILE 5x2 Cân đối) === */
-    #groupSwitches {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin: 10px 0;
-        padding: 0 5px;
-    }
-    /* Grid 5 cột cho cả hai hàng (5-5) */
-    .group-row { 
-        display: grid; 
-        grid-template-columns: repeat(5, 1fr); 
-        gap: 8px 3px; /* Giảm khoảng cách ngang */
-        width: 100%;
-        /* đảm bảo row-1 và row-2 hiển thị grid 5 cột */
-    }
-    #row-3 { display: none; } /* Ẩn row 3 không dùng trong bố cục 5x2 */
-
-    .switch-container { 
-      display:flex; 
-      align-items:center; 
-      gap:3px;
-      justify-content: center;
-    }
-    .switch { position:relative; display:inline-block; width:40px; height:22px; }
-    .switch input { opacity:0; width:0; height:0; }
-    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#64748b; transition:.4s; border-radius:22px; }
-    .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
-    input:checked + .slider { background-color:#22c55e; }
-    input:checked + .slider:before { transform:translateX(18px); }
-    .switch-label { font-size: 3vw; color:#f1f5f9; } /* Điều chỉnh font nhỏ hơn để phù hợp với 5 cột */
-
-
-    /* === ANSWERS & STATUS STYLES === */
-    .answers{ 
-      display:grid; 
-      grid-template-columns:repeat(2,1fr); 
-      gap:8px; 
-      margin-top:10px; 
-      margin-bottom: 10px;
-    }
-    /* === HOÀN NGUYÊN STYLE BUTTON CŨ VÀ XÓA HIỆU ỨNG TRANSFORM === */
-    button{ 
-      padding:12px;
-      font-size:4vw; /* Giữ kích thước tương đối trên mobile */
-      border:none; 
-      border-radius:8px; 
-      cursor:pointer; 
-      background:#334155; 
-      color:#f1f5f9; 
-      transition:all 0.25s; 
-    }
-    button:hover:not(:disabled){ 
-        background:#475569; 
-        /* Xóa transform:scale(1.05) */
-    }
-    .correct{ background:#22c55e !important; color:#fff !important; }
-    .wrong{ background:#ef4444 !important; color:#fff !important; }
-
-    #stats{ margin-top:10px; font-size:3.5vw; }
-    #status{ font-size: 4vw; font-weight: bold; margin: 5px 0; }
-    
-    /* === MEDIA QUERY CHO MÀN HÌNH LỚN HƠN (Desktop/Tablet: Giữ nguyên layout ban đầu) === */
-    @media (min-width: 768px) {
-      body { padding: 20px; }
-      .game-box {
-        width: 750px;
-        padding: 20px;
-      }
-      h2 { font-size: 24px; }
-      .kana { font-size: 90px; margin: 20px; }
-      
-      /* Restore Original Control Layout: 1 hàng */
-      .controls-top {
-        flex-direction: row; 
-        justify-content: center;
-        gap: 15px;
-        margin: 15px 0;
-        padding: 0;
-      }
-      .control-row {
-        justify-content: center;
-        gap: 15px;
-        font-size: 16px;
-      }
-      .control-row > span { display: inline; } /* Hiện lại dấu | */
-      select.form-control, input.form-control { 
-          font-size: 16px; 
-          max-width: none; 
-          padding: 6px 12px;
-      }
-      
-      /* Restore Original Time/Button Layout: 1 hàng */
-      .time-start-controls {
-        margin: 15px 0;
-        gap: 15px;
-        flex-wrap: nowrap;
-      }
-      .time-start-controls label { 
-        font-size: 16px; 
-      }
-      .time-start-controls input.form-control { width: auto; min-width: 0; }
-      .time-start-controls button {
-        font-size: 20px; 
-        padding: 12px;
-        flex-basis: auto;
-      }
-      
-      /* Buttons Desktop style */
-      button { 
-        font-size:20px;
-        padding:12px;
-      }
-      button:hover:not(:disabled){ background:#475569; }
-
-      /* Restore Original Switch Layout (Single row flex-wrap) */
-      #groupSwitches {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: center;
-        margin: 15px 0;
-      }
-      .group-row {
-          display: flex; /* Trở lại flex cho desktop */
-          grid-template-columns: none;
-          gap: 15px;
-      }
-      #row-2, #row-3 {
-        display: none; 
-      }
-      
-      /* Cấu hình lại Switch trên desktop */
-      .switch-container { justify-content: flex-start; }
-      .switch { width:46px; height:24px; }
-      .slider:before { height:18px; width:18px; }
-      input:checked + .slider:before { transform:translateX(22px); }
-      .switch-label { font-size: 14px; }
-
-      #stats { font-size: 18px; }
-      #status { font-size: 20px; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="game-box">
     <h2>Mini Game Kana</h2>
-    
+
     <div class="controls">
       <div class="controls-top">
-          <div class="control-row">
-            <label>Bảng chữ: 
-              <select id="mode" class="form-control">
-                <option value="hiragana">Hiragana</option>
-                <option value="katakana">Katakana</option>
-              </select>
-            </label>
-            <span>|</span>
+        <div class="control-row">
+          <label>Bảng chữ:
+            <select id="mode" class="form-control">
+              <option value="hiragana">Hiragana</option>
+              <option value="katakana">Katakana</option>
+            </select>
+          </label>
+          <span>|</span>
+        </div>
+        <div class="control-row">
+          <label>Mode:
+            <select id="questionMode" class="form-control">
+              <option value="toRoma">Chọn Romaji từ Ký tự</option>
+              <option value="toKana">Chọn Ký tự từ Romaji</option>
+            </select>
+          </label>
+
+          <span>|</span>
+
+        </div>
+        <div class="control-row">
+          <div class="switch-container">
+            <span class="switch-label">
+              Ẩn/Hiện
+            </span>
+            <label class="switch">
+              <input type="checkbox" class="switch-show-hide" value="#" name="#" checked="" onchange="toggleShowHideAns(this)">
+
+              <span class="slider"></span></label>
+              
+            
           </div>
-          <div class="control-row">
-            <label>Chế độ câu hỏi:
-              <select id="questionMode" class="form-control">
-                <option value="toRoma">Chọn Romaji từ Ký tự</option>
-                <option value="toKana">Chọn Ký tự từ Romaji</option>
-              </select>
-            </label>
-          </div>
+        </div>
       </div>
 
       <div id="groupSwitches">
-        </div>
-      
+      </div>
+
       <div class="time-start-controls">
-        <label>Thời gian suy nghĩ mỗi câu (giây): <input type="number" id="thinkTime" value="5" min="1" class="form-control"></label>
+        <label>Thời gian suy nghĩ mỗi câu (giây): <input type="number" id="thinkTime" value="5" min="1"
+            class="form-control"></label>
         <button onclick="startGame()">Bắt đầu</button>
         <button onclick="resetGame()">Đặt lại</button>
       </div>
     </div>
 
     <div class="kana" id="kana">?</div>
-    
+
     <p id="status">Nhấn Bắt đầu cho câu tiếp theo.</p>
 
     <div class="answers" id="answersBox">
@@ -310,229 +83,12 @@ max-height: 18vh;
       <button onclick="chooseAnswer(2)" id="btn2"></button>
       <button onclick="chooseAnswer(3)" id="btn3"></button>
     </div>
-    
+
     <div id="stats">
       ✅ Đúng: <span id="correct">0</span> | ❌ Sai: <span id="wrong">0</span> | 📊 Tổng: <span id="total">0</span>
     </div>
   </div>
-  <script>
-    const kanaMap = {
-      a:{hiragana:["あ","い","う","え","お"], katakana:["ア","イ","ウ","エ","オ"], roma:["a","i","u","e","o"]},
-      k:{hiragana:["か","き","く","け","こ"], katakana:["カ","キ","ク","ケ","コ"], roma:["ka","ki","ku","ke","ko"]},
-      s:{hiragana:["さ","し","す","せ","そ"], katakana:["サ","シ","ス","セ","ソ"], roma:["sa","shi","su","se","so"]},
-      t:{hiragana:["た","ち","つ","て","と"], katakana:["タ","チ","ツ","テ","ト"], roma:["ta","chi","tsu","te","to"]},
-      n:{hiragana:["な","に","ぬ","ね","の"], katakana:["ナ","ニ","ヌ","ネ","ノ"], roma:["na","ni","nu","ne","no"]},
-      h:{hiragana:["は","ひ","ふ","へ","ほ"], katakana:["ハ","ヒ","フ","ヘ","ホ"], roma:["ha","hi","fu","he","ho"]},
-      m:{hiragana:["ま","み","む","め","も"], katakana:["マ","ミ","ム","メ","モ"], roma:["ma","mi","mu","me","mo"]},
-      y:{hiragana:["や","ゆ","よ"], katakana:["ヤ","ユ","ヨ"], roma:["ya","yu","yo"]},
-      r:{hiragana:["ら","り","る","れ","ろ"], katakana:["ラ","リ","ル","レ","ロ"], roma:["ra","ri","ru","re","ro"]},
-      w:{hiragana:["わ","を","ん"], katakana:["ワ","ヲ","ン"], roma:["wa","wo","n"]}
-    };
-
-    let correct=0, wrong=0, total=0;
-    let currentAnswer="";
-    let timer;
-    let scrambleInterval;
-
-    const groupKeys = Object.keys(kanaMap);
-
-    function renderGroupSwitches(){
-      const container=document.getElementById("groupSwitches");
-      container.innerHTML="";
-      
-      const rows = [
-          { id: 'row-1', keys: groupKeys.slice(0, 5) },  // 5 items
-          { id: 'row-2', keys: groupKeys.slice(5, 10) } // 5 items
-      ];
-      
-      // Xử lý bố cục Desktop: Chuyển tất cả về row-1 duy nhất (Flex-wrap)
-      if (window.innerWidth >= 768) {
-          const rowDiv = document.createElement("div");
-          rowDiv.className = "group-row";
-          rowDiv.id = 'row-1';
-          
-          groupKeys.forEach(key => {
-              const div=document.createElement("div");
-              div.className="switch-container";
-              const isChecked = document.querySelector(`.groupFilter[value="${key}"]`) ? document.querySelector(`.groupFilter[value="${key}"]`).checked : true;
-              div.innerHTML=`<label class="switch"><input type="checkbox" class="groupFilter" value="${key}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label><span class="switch-label">${key}</span>`;
-              rowDiv.appendChild(div);
-          });
-          container.appendChild(rowDiv);
-          // Đảm bảo chỉ có row-1 hiển thị trên desktop
-          document.getElementById('row-2')?.remove();
-      } 
-      // Xử lý bố cục Mobile: 5x2 (Grid)
-      else {
-          rows.forEach(rowInfo => {
-              const rowDiv = document.createElement("div");
-              rowDiv.className = "group-row";
-              rowDiv.id = rowInfo.id;
-              
-              rowInfo.keys.forEach(key => {
-                  const div=document.createElement("div");
-                  div.className="switch-container";
-                  const isChecked = document.querySelector(`.groupFilter[value="${key}"]`) ? document.querySelector(`.groupFilter[value="${key}"]`).checked : true;
-                  div.innerHTML=`<label class="switch"><input type="checkbox" class="groupFilter" value="${key}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label><span class="switch-label">${key}</span>`;
-                  rowDiv.appendChild(div);
-              });
-              container.appendChild(rowDiv);
-          });
-          // Xóa row-3 cũ nếu nó tồn tại
-          document.getElementById('row-3')?.remove();
-      }
-    }
-
-    function getSelectedGroups(){
-      return [...document.querySelectorAll('.groupFilter:checked')].map(cb=>cb.value);
-    }
-
-    function scrambleText(element, finalText, duration=1500, qMode="toRoma", mode="hiragana", groups=[], onComplete){
-      clearInterval(scrambleInterval);
-      let chars = "";
-      
-      groups.forEach(g => {
-          if (qMode === "toRoma") {
-              chars += kanaMap[g][mode].join("");
-          } else {
-              chars += kanaMap[g].roma.join("");
-          }
-      });
-      
-      if (qMode !== "toRoma") {
-          chars = [...new Set(chars)].join('');
-      }
-
-      let elapsed=0;
-      const interval=80;
-      scrambleInterval=setInterval(()=>{
-        let display="";
-        let displayLength = 1;
-        
-        for(let i=0;i<displayLength;i++){
-          display+=chars.charAt(Math.floor(Math.random()*chars.length));
-        }
-        element.textContent=display;
-        
-        elapsed+=interval;
-        if(elapsed>=duration){
-          clearInterval(scrambleInterval);
-          element.textContent=finalText;
-          if(onComplete) onComplete();
-        }
-      },interval);
-    }
-
-    function startGame(){
-      clearTimeout(timer);
-      
-      document.querySelectorAll(".answers button").forEach(btn=>{
-        btn.disabled=false;
-        btn.classList.remove("correct","wrong");
-        btn.textContent = ""; 
-      });
-      
-      let mode=document.getElementById("mode").value;
-      let qMode=document.getElementById("questionMode").value;
-      let groups=getSelectedGroups();
-      if(groups.length===0){alert("Chọn ít nhất 1 nhóm");return;}
-      
-      let group=groups[Math.floor(Math.random()*groups.length)];
-      let idx=Math.floor(Math.random()*kanaMap[group].roma.length);
-      let kanaChar=kanaMap[group][mode][idx];
-      let romaChar=kanaMap[group].roma[idx];
-      
-      currentAnswer=(qMode==="toRoma"?romaChar:kanaChar);
-      let questionDisplay=(qMode==="toRoma"?kanaChar:romaChar);
-      
-      const kanaElem=document.getElementById("kana");
-      
-      let answers=[currentAnswer];
-      const allPossibleAnswers = groups.flatMap(g => 
-        (qMode === "toRoma" ? kanaMap[g].roma : kanaMap[g][mode])
-      ).filter(ans => ans !== currentAnswer);
-
-      allPossibleAnswers.sort(() => Math.random() - 0.5);
-      const incorrectAnswers = allPossibleAnswers.slice(0, 3);
-      answers = [...answers, ...incorrectAnswers];
-
-      answers.sort(()=>Math.random()-0.5);
-      
-      const onAnimationComplete = () => {
-          answers.forEach((ans,i)=>{document.getElementById("btn"+i).textContent=ans;});
-          document.getElementById("status").textContent="Chọn đáp án đúng!";
-
-          timer=setTimeout(()=>{
-              wrong++;
-              document.getElementById("wrong").textContent=wrong;
-              
-              document.querySelectorAll(".answers button").forEach(btn => {
-                  if (btn.textContent === currentAnswer) {
-                      btn.classList.add("correct");
-                  }
-              });
-
-              document.getElementById("status").textContent="⏰ Hết giờ! Đáp án đúng: "+currentAnswer;
-              document.querySelectorAll(".answers button").forEach(btn=>btn.disabled=true);
-          }, document.getElementById("thinkTime").value*1000);
-      };
-
-      scrambleText(kanaElem, questionDisplay, 1500, qMode, mode, groups, onAnimationComplete);
-      
-      total++;
-      document.getElementById("total").textContent=total;
-      document.getElementById("status").textContent="Đang tải câu hỏi...";
-    }
-
-    function chooseAnswer(i){
-      clearTimeout(timer);
-      let btn=document.getElementById("btn"+i);
-      
-      document.querySelectorAll(".answers button").forEach(b=>b.disabled=true);
-
-      if(btn.textContent===currentAnswer){
-        correct++;
-        btn.classList.add("correct"); 
-        document.getElementById("status").textContent="🎉 Đúng!";
-      } else {
-        wrong++;
-        btn.classList.add("wrong"); 
-        
-        document.querySelectorAll(".answers button").forEach(correctBtn => {
-            if (correctBtn.textContent === currentAnswer) {
-                correctBtn.classList.add("correct"); 
-            }
-        });
-        
-        document.getElementById("status").textContent=`❌ Sai! Đáp án đúng: ${currentAnswer}`;
-      }
-      
-      document.getElementById("correct").textContent=correct;
-      document.getElementById("wrong").textContent=wrong;
-    }
-
-    function resetGame(){
-      correct=wrong=total=0;
-      document.getElementById("correct").textContent=0;
-      document.getElementById("wrong").textContent=0;
-      document.getElementById("total").textContent=0;
-      document.getElementById("status").textContent="Nhấn Bắt đầu cho câu tiếp theo.";
-      const kanaElem=document.getElementById("kana");
-      kanaElem.textContent="?";
-      clearInterval(scrambleInterval);
-      document.querySelectorAll(".answers button").forEach(btn=>{btn.textContent="";btn.classList.remove("correct","wrong");btn.disabled=false;});
-    }
-
-    renderGroupSwitches();
-    
-    // Thêm listener để gọi lại render khi resize (chuyển đổi mobile/desktop)
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            renderGroupSwitches();
-        }, 100);
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
+
 </html>

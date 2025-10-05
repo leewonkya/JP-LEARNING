@@ -1,0 +1,249 @@
+/* === BASE STYLES: Áp dụng cho cả Mobile và Desktop === */
+    body { 
+      background:#0f172a; 
+      color:#f1f5f9; 
+      font-family:sans-serif; 
+      text-align:center; 
+      margin:0; 
+      padding:10px; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;    
+	overflow: hidden;
+    }
+    .game-box{ 
+      margin:10px auto; 
+      padding:15px; 
+      background:#1e293b; 
+      border-radius:12px; 
+      width:750px; 
+      max-width:100%; 
+      box-shadow:0 4px 12px rgba(0,0,0,0.4); 
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    h2{ 
+      margin-top:0; 
+      color:#facc15; 
+      font-size: 5vw; 
+    }
+    .kana{ 
+      font-size:15vw; 
+      margin:10px; 
+      min-height:10vh;     
+max-height: 18vh;
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      font-weight:bold; 
+      letter-spacing:3px; 
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    
+    /* === CONTROL LAYOUT FIXES (MOBILE) === */
+    .controls-top { 
+        display: flex;
+        flex-direction: column; /* 2 hàng riêng biệt cho Bảng chữ & Chế độ */
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 0 5px;
+    }
+    .control-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+        font-size: 3.5vw;
+    }
+    select.form-control, input.form-control {
+      padding:6px 8px; 
+      font-size:3.5vw; 
+      line-height:1.5; 
+      color:#1e293b; 
+      background-color:#fff;
+      border:1px solid #ced4da; 
+      border-radius:0.375rem;
+      max-width: 50vw;
+    }
+    .control-row label {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+    .control-row > span { display: none; }
+
+    /* === TIME AND BUTTONS LAYOUT (MOBILE) === */
+    .time-start-controls {
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .time-start-controls label {
+        display: flex;
+        align-items: center;
+        font-size: 3.5vw;
+        flex-shrink: 0;
+    }
+    .time-start-controls input.form-control {
+        width: 10vw; 
+        min-width: 40px;
+        text-align: center;
+    }
+    .time-start-controls button {
+        flex-basis: 40%; 
+        font-size: 4vw;
+        padding: 10px;
+    }
+
+    /* === TOGGLE SWITCHES LAYOUT (MOBILE 5x2 Cân đối) === */
+    #groupSwitches {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+        padding: 0 5px;
+    }
+    /* Grid 5 cột cho cả hai hàng (5-5) */
+    .group-row { 
+        display: grid; 
+        grid-template-columns: repeat(5, 1fr); 
+        gap: 8px 3px; /* Giảm khoảng cách ngang */
+        width: 100%;
+        /* đảm bảo row-1 và row-2 hiển thị grid 5 cột */
+    }
+    #row-3 { display: none; } /* Ẩn row 3 không dùng trong bố cục 5x2 */
+
+    .switch-container { 
+      display:flex; 
+      align-items:center; 
+      gap:3px;
+      justify-content: center;
+    }
+    .switch { position:relative; display:inline-block; width:40px; height:22px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#64748b; transition:.4s; border-radius:22px; }
+    .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:3px; background:white; transition:.4s; border-radius:50%; }
+    input:checked + .slider { background-color:#22c55e; }
+    input:checked + .slider:before { transform:translateX(18px); }
+    .switch-label { font-size: 3vw; color:#f1f5f9; } /* Điều chỉnh font nhỏ hơn để phù hợp với 5 cột */
+
+
+    /* === ANSWERS & STATUS STYLES === */
+    .answers{ 
+      display:grid; 
+      grid-template-columns:repeat(2,1fr); 
+      gap:8px; 
+      margin-top:10px; 
+      margin-bottom: 10px;
+    }
+    /* === HOÀN NGUYÊN STYLE BUTTON CŨ VÀ XÓA HIỆU ỨNG TRANSFORM === */
+    button{ 
+      padding:12px;
+      font-size:4vw; /* Giữ kích thước tương đối trên mobile */
+      border:none; 
+      border-radius:8px; 
+      cursor:pointer; 
+      background:#334155; 
+      color:#f1f5f9; 
+      transition:all 0.25s; 
+    }
+    button:hover:not(:disabled){ 
+        background:#475569; 
+        /* Xóa transform:scale(1.05) */
+    }
+    .correct{ background:#22c55e !important; color:#fff !important; }
+    .wrong{ background:#ef4444 !important; color:#fff !important; }
+
+    #stats{ margin-top:10px; font-size:3.5vw; }
+    #status{ font-size: 4vw; font-weight: bold; margin: 5px 0; }
+
+    .hide {display: none;}
+    
+    /* === MEDIA QUERY CHO MÀN HÌNH LỚN HƠN (Desktop/Tablet: Giữ nguyên layout ban đầu) === */
+    @media (min-width: 768px) {
+      body { padding: 20px; }
+      .game-box {
+        width: 750px;
+        padding: 20px;
+      }
+      h2 { font-size: 24px; }
+      .kana { font-size: 90px; margin: 20px; }
+      
+      /* Restore Original Control Layout: 1 hàng */
+      .controls-top {
+        flex-direction: row; 
+        justify-content: center;
+        gap: 15px;
+        margin: 15px 0;
+        padding: 0;
+      }
+      .control-row {
+        justify-content: center;
+        gap: 15px;
+        font-size: 16px;
+      }
+      .control-row > span { display: inline; } /* Hiện lại dấu | */
+      select.form-control, input.form-control { 
+          font-size: 16px; 
+          max-width: none; 
+          padding: 6px 12px;
+      }
+      
+      /* Restore Original Time/Button Layout: 1 hàng */
+      .time-start-controls {
+        margin: 15px 0;
+        gap: 15px;
+        flex-wrap: nowrap;
+      }
+      .time-start-controls label { 
+        font-size: 16px; 
+      }
+      .time-start-controls input.form-control { width: auto; min-width: 0; }
+      .time-start-controls button {
+        font-size: 20px; 
+        padding: 12px;
+        flex-basis: auto;
+      }
+      
+      /* Buttons Desktop style */
+      button { 
+        font-size:20px;
+        padding:12px;
+      }
+      button:hover:not(:disabled){ background:#475569; }
+
+      /* Restore Original Switch Layout (Single row flex-wrap) */
+      #groupSwitches {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin: 15px 0;
+      }
+      .group-row {
+          display: flex; /* Trở lại flex cho desktop */
+          grid-template-columns: none;
+          gap: 15px;
+      }
+      #row-2, #row-3 {
+        display: none; 
+      }
+      
+      /* Cấu hình lại Switch trên desktop */
+      .switch-container { justify-content: flex-start; }
+      .switch { width:46px; height:24px; }
+      .slider:before { height:18px; width:18px; }
+      input:checked + .slider:before { transform:translateX(22px); }
+      .switch-label { font-size: 14px; }
+
+      #stats { font-size: 18px; }
+      #status { font-size: 20px; }
+    }
