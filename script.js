@@ -16,6 +16,63 @@ let currentAnswer = "";
 let timer;
 let scrambleInterval;
 
+// === CÁC BIẾN MỚI CHO ÂM THANH (WEB SPEECH API) ===
+let audioEnabled = true; // Mặc định bật âm thanh
+const synth = window.speechSynthesis;
+// Tìm giọng Nhật Bản (ja-JP) để phát âm chính xác
+let voice = null;
+if (synth) {
+    synth.onvoiceschanged = () => {
+        voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+    };
+    if (synth.getVoices().length > 0) {
+        voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+    }
+}
+
+// === HÀM PHÁT ÂM MỚI ===
+function speakKana(kana) {
+    if (!audioEnabled || !synth) return;
+
+    // Hủy bỏ giọng nói đang chạy (nếu có)
+    if (synth.speaking) {
+        synth.cancel();
+    }
+
+    const utterance = new SpeechSynthesisUtterance(kana);
+    utterance.lang = 'ja-JP';
+    
+    let qMode = document.getElementById("questionMode").value;
+
+    if(qMode === 'toKana'){
+        utterance.lang = 'en-US';
+        voice = synth.getVoices().find(v => v.lang === 'en-US') || null;
+    }else{
+        utterance.lang = 'ja-JP';
+        voice = synth.getVoices().find(v => v.lang === 'ja-JP') || null;
+    }
+
+    if (voice) {
+        utterance.voice = voice;
+    }
+    utterance.rate = 0.8;
+
+    synth.speak(utterance);
+}
+
+// === XỬ LÝ NÚT BẬT/TẮT ÂM THANH ===
+document.getElementById("toggleAudioBtn").addEventListener('click', function () {
+    audioEnabled = !audioEnabled;
+    if (audioEnabled) {
+        this.textContent = '🔊';
+    } else {
+        this.textContent = '🔇';
+        if (synth && synth.speaking) {
+            synth.cancel(); // Tắt âm thanh đang phát
+        }
+    }
+});
+
 const groupKeys = Object.keys(kanaMap);
 
 function renderGroupSwitches() {
@@ -100,6 +157,7 @@ function scrambleText(element, finalText, duration = 1500, qMode = "toRoma", mod
         if (elapsed >= duration) {
             clearInterval(scrambleInterval);
             element.textContent = finalText;
+            speakKana(finalText);
             if (onComplete) onComplete();
         }
     }, interval);
