@@ -140,9 +140,13 @@ function startGame() {
 
     answers.sort(() => Math.random() - 0.5);
 
+    let buttonAnsShowed = document.getElementsByClassName("switch-show-hide");
+
+    let isButtonChecked = buttonAnsShowed.checked;
+
     const onAnimationComplete = () => {
         answers.forEach((ans, i) => { document.getElementById("btn" + i).textContent = ans; });
-        document.getElementById("status").textContent = "Chọn đáp án đúng!";
+        document.getElementById("status").textContent = !isButtonChecked ? "Đang đợi câu trả lời" : "Chọn đáp án đúng!";
 
         timer = setTimeout(() => {
             wrong++;
